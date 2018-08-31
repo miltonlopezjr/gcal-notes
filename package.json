@@ -1,0 +1,11 @@
+{
+  "name": "hrnyc17-milton-mvp",
+  "version": "1.0.0",
+  "description": "GCAL Notes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Milton Lopez",
+  "license": "ISC"
+}

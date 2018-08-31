@@ -1,0 +1,6 @@
+
+var fetchAll = () => {
+}
+
+var addOne = () => {
+}

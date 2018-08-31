@@ -2,7 +2,7 @@ const express = require('express')
 const axios = require('axios')
 const body = require('body-parser')
 const cors = require('cors')
-const env = require('dotenv')
+const env = require('dotenv').config()
 const path = require('path')
 
 const app = express()
@@ -20,4 +20,4 @@ app.get('/events', (req, res) => {
   res.send(rtn);
 })
 
-app.listen(3000, () => console.log('App listening..'))
+app.listen(process.env.PORT, () => console.log('App listening..'))

@@ -8,11 +8,13 @@ class App extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      events: [],
+      dailyEvents: [],
+      allDayEvents: [],
       authURL : false
     }
     this.getEvents = this.getEvents.bind(this);
     this.getAuthURL = this.getAuthURL.bind(this);
+    this.getLoadEvents = this.getLoadEvents.bind(this);
   }
 
   componentDidMount(){
@@ -22,6 +24,16 @@ class App extends React.Component {
   getAuthURL (url){
     this.setState({
       authURL : url
+    })
+  }
+
+  getLoadEvents (){
+    axios.get('/loadEvents')
+    .then((data) => {
+      console.log(data)
+    })
+    .catch((err) => {
+      console.log(err)
     })
   }
 
@@ -41,7 +53,7 @@ class App extends React.Component {
         })
       } else if (data.length) {
         this.setState({
-          events: data
+          dailyEvents: data
         })
       }
     })
@@ -53,7 +65,10 @@ class App extends React.Component {
   render(){
     return (
       <div>
-        { this.state.authURL ? <div>Please login:<a href={this.state.authURL}>Here</a></div> : <div><h1>Hello {this.props.name}</h1><EventList events={this.state.events} /></div> }        
+        <div>
+          <button onClick={this.getLoadEvents()}>Load Events</button>
+        </div>
+        { this.state.authURL ? <div>Please login:<a href={this.state.authURL}>Here</a></div> : <div><h1>Hello {this.props.name}</h1><EventList events={this.state.dailyEvents} /></div> }        
       </div>
     )
   }

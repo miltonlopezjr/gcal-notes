@@ -1,19 +1,24 @@
 import React from 'react';
+import NoteList from './NoteList.jsx';
 
-class EventList extends React.Component {
+class Event extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+      isOpen: false
+    };
     this.setTime = this.setTime.bind(this);
+    this.toggleNotes = this.toggleNotes.bind(this);
   }
   setTime (){
-    //check if start.dateTime is defined
-    if(this.props.event.start.dateTime) {
-      let start = new Date(this.props.event.start.dateTime);
-      let end = new Date(this.props.event.end.dateTime);
+      let start = new Date(this.props.event.startTime);
+      let end = new Date(this.props.event.endTime);
       return `${start} - ${end}`;
-    } else {
-      return this.props.event.start.date;
-    }
+  }
+  toggleNotes () {
+    this.setState({
+      isOpen: !this.state.isOpen
+    });
   }
   render() {
     return (
@@ -22,9 +27,10 @@ class EventList extends React.Component {
       <div className="time">
         {this.setTime()}
       </div>
+    { this.state.isOpen ? (<NoteList showNotes={this.state.isOpen} onClose={this.toggleNotes} eventId={this.props.event.id}/>) : (<div><button onClick={this.toggleNotes}>Show notes</button></div>) }
     </div>
     )
   }
 }
 
-export default EventList;
+export default Event;

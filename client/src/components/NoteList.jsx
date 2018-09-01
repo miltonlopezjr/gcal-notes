@@ -13,11 +13,13 @@ class NoteList extends React.Component {
     this.handleInputNoteChange = this.handleInputNoteChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.postNote = this.postNote.bind(this)
+    this.deleteNote = this.deleteNote.bind(this)
   }
   componentDidMount(){
     this.getNotes(this.props.eventId)
   }
   getNotes (eventId){
+    console.log('getting..')
     axios.get(`/notes?eventId=${eventId}`)
     .then(({data}) => {
       this.setState({
@@ -26,6 +28,20 @@ class NoteList extends React.Component {
     })
     .catch((err) => {
       console.log(err``)
+    })
+  }
+  deleteNote (note){
+    axios.delete('/note', {data: 
+      {
+      eventId : this.props.eventId,
+      noteText : note
+    }})
+    .then((res)=> {
+      console.log('delted')
+      this.getNotes(this.props.eventId)
+    })
+    .catch((err) => {
+      console.log(err)
     })
   }
   handleInputNoteChange (event){
@@ -91,7 +107,7 @@ class NoteList extends React.Component {
         <h1>You have {this.state.notes.length} <u>{this.props.eventName}</u> notes!</h1>
         <div>
           {
-            this.state.notes.map((note) => ( <Note key={note.id} note={note} eventid={this.props.eventId} /> ))
+            this.state.notes.map((note) => ( <Note key={note.text} note={note} eventid={this.props.eventId} deleteNote={this.deleteNote} /> ))
           }
         </div>
         <div>

@@ -68,7 +68,21 @@ app.post('/note', (req,res) => {
   } else {
     res.send('no eventid and note')
   }
-    
+})
+
+app.delete('/note', (req,res) => {
+  if(req.body.eventId && req.body.noteText)
+  {
+    db.deleteNote(req.body.noteText,req.body.eventId, (err, data) => {
+      if(err){
+        res.sendStatus(500)
+      } else {
+        res.sendStatus(202);
+      }
+    })
+  } else {
+    res.send('no eventid and note')
+  }
 })
 
 app.get('/getAccessURL', (req, res) => {

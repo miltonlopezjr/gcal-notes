@@ -64,6 +64,15 @@ let saveNote = (noteText, eventId, callback) => {
     })
 }
 
+let deleteNote = (noteText, eventId, callback) => {
+  Note.deleteOne(
+    { text : noteText }
+  ).exec((err, note) => {
+    if(err) callback(err)
+    callback(null, note)
+  })
+}
+
 let retrieveAllDayEvents = () => {
   let today = Date.now()
   let maxDate = new Date(today).setMonth(new Date(today).getMonth() + 1);
@@ -108,3 +117,4 @@ module.exports.retrieveAllDayEvents = retrieveAllDayEvents
 module.exports.retrieveDailyEvents = retrieveDailyEvents
 module.exports.saveNote = saveNote
 module.exports.saveEvents = saveEvents
+module.exports.deleteNote = deleteNote

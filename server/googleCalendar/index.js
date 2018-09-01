@@ -29,10 +29,16 @@ function authorize (callback) {
   fs.readFile(path.join(__dirname,TOKEN_PATH), (err, token) => {
     if(err) {
       console.log(err)
-      callback(err);
+      if(err.errno === -2){
+        callback('Token not set');
+      } else {
+        callback(err)
+      }
+      
+    } else {
+      oAuth2Client.setCredentials(JSON.parse(token));
+      callback(null, oAuth2Client);
     }
-    oAuth2Client.setCredentials(JSON.parse(token));
-    callback(null, oAuth2Client);
   })
 }
 
@@ -96,26 +102,30 @@ function listEvents(auth,callback) {
 
 let getCalendarEvents = function getCalendarEvents(callback) {
   authorize((err, auth) => {
-    if(err) callback(err)
-    listEvents(auth, (err, events)=> {
-      if(err) callback(err);
-      // let eventsArry = events.map((event) => {
-      //   return {
-      //     id: event.id,
-      //     summary: event.summary
-      //   }
-      // })
-      callback(null, events);
-      // if(events.length) {
-      //   console.log('Upcoming 10 events:');
-      //   events.map((event,i) => {
-      //     const start = event.start.dateTime || event.start.date;
-      //     console.log(`${start} - ${event.summary}`);
-      //   });
-      // } else {
-      //   console.log('No upcoming events found.');
-      // }
-    })
+    if(err) {
+      callback(err)
+    }
+    else {
+      listEvents(auth, (err, events)=> {
+        if(err) callback(err);
+        // let eventsArry = events.map((event) => {
+        //   return {
+        //     id: event.id,
+        //     summary: event.summary
+        //   }
+        // })
+        callback(null, events);
+        // if(events.length) {
+        //   console.log('Upcoming 10 events:');
+        //   events.map((event,i) => {
+        //     const start = event.start.dateTime || event.start.date;
+        //     console.log(`${start} - ${event.summary}`);
+        //   });
+        // } else {
+        //   console.log('No upcoming events found.');
+        // }
+      })
+    }
   })
 }
 

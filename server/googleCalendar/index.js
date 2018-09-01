@@ -2,10 +2,16 @@ const fs = require('fs')
 const readline = require('readline')
 const {google} = require('googleapis')
 const path = require('path')
+const alert = require('alert-node')
 
 //if modifying these scopes, delete token.json = credentials.json?
 const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 const TOKEN_PATH = 'token.json';
+
+const oAuth2Client = new google.auth.OAuth2(
+  process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.redirect_uris
+);
+
 
 // function getCreds (callback){
 //   //Load client secrets from a local file.
@@ -18,13 +24,13 @@ const TOKEN_PATH = 'token.json';
 
 function authorize (callback) {
   // const {client_secret, client_id, redirect_uris} = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.redirect_uris
-  );
-
+  
   //check if we have previously stored token
   fs.readFile(path.join(__dirname,TOKEN_PATH), (err, token) => {
-    if(err) return getAccessToken(oAuth2Client, callback);
+    if(err) {
+      console.log(err)
+      callback(err);
+    }
     oAuth2Client.setCredentials(JSON.parse(token));
     callback(null, oAuth2Client);
   })
@@ -32,28 +38,41 @@ function authorize (callback) {
 
 // get and store new token after prompting for user auth, then execute
 // callback with authorized OAuth2 client
-function getAccessToken(oAuth2Client, callback) {
+function getAccessURL(callback) {
+  
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES
   });
-  console.log('Authorize this app by visiting this url :', authUrl);
-  const r1 = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  r1.question('Enter the code from that page here :', (code) => {
-    r1.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.err('Error retrieving access token', err);
-      oAuth2Client.setCredentials(token);
-      // store token to disk for later program exectuions
-      fs.writeFile(path.join(__dirname,TOKEN_PATH), JSON.stringify(token), (err) => {
-        if (err) console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-      callback(null, oAuth2Client);
+
+  callback(authUrl);
+
+  // console.log('Authorize this app by visiting this url :', authUrl);
+  // alert('Authorize this app by visiting this url :', authUrl)
+  // const r1 = readline.createInterface({
+  //   input: process.stdin,
+  //   output: process.stdout,
+  // });
+  // r1.question('Enter the code from that page here :', (code) => {
+  //   r1.close();
+    
+  // });
+}
+
+function setAccessToken(code,callback){
+  oAuth2Client.getToken(code, (err, token) => {
+    if (err) {
+      console.err('Error retrieving access token', err);
+      callback(err)
+    }
+    oAuth2Client.setCredentials(token);
+    // store token to disk for later program exectuions
+    fs.writeFile(path.join(__dirname,TOKEN_PATH), JSON.stringify(token), (err) => {
+      if (err) console.error(err);
+      console.log('Token stored to', TOKEN_PATH);
+      callback(null, 'Token stored');
     });
+    // callback(null, oAuth2Client);
   });
 }
 
@@ -67,17 +86,19 @@ function listEvents(auth,callback) {
     singleEvents: true,
     orderBy: 'startTime',
   }, (err, res) => {
-    if(err) return console.log('The API returned an error: ', err);
-    const events = res.data.items;
-    callback(events);
+    if(err) { 
+      console.log('The API returned an error: ', err);
+      callback(err)
+    }
+    callback(null,res.data.items);
   });
 } 
 
 let getCalendarEvents = function getCalendarEvents(callback) {
-  authorize((err, auth)=>{
+  authorize((err, auth) => {
     if(err) callback(err)
-    listEvents(auth, (events)=> {
-
+    listEvents(auth, (err, events)=> {
+      if(err) callback(err);
       // let eventsArry = events.map((event) => {
       //   return {
       //     id: event.id,
@@ -99,3 +120,5 @@ let getCalendarEvents = function getCalendarEvents(callback) {
 }
 
 module.exports.getCalendarEvents = getCalendarEvents;
+module.exports.getAccessURL = getAccessURL;
+module.exports.setAccessToken = setAccessToken;

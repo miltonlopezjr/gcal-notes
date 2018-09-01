@@ -13,6 +13,7 @@
   "author": "Milton Lopez",
   "license": "ISC",
   "dependencies": {
+    "alert-node": "^1.2.1",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "bootstrap": "^4.1.3",

@@ -4,16 +4,11 @@ class Note extends React.Component {
   constructor(props){
     super(props);
   }
-
-  addNote () {
-    
-  }
-
   render() {
     return (
-    <div>
-      <div className="title">{this.props.note.name}</div>
-      <div className="text">
+    <div className="noteText">
+      <div className="noteIcons"><i class="fas fa-edit"></i><i class="fas fa-trash-alt"></i></div>
+      <div>
         {this.props.note.text}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import NoteList from './NoteList.jsx';
+import moment from 'moment';
 
 class Event extends React.Component {
   constructor(props){
@@ -11,8 +12,8 @@ class Event extends React.Component {
     this.toggleNotes = this.toggleNotes.bind(this);
   }
   setTime (){
-      let start = new Date(this.props.event.startTime);
-      let end = new Date(this.props.event.endTime);
+      let start = moment(this.props.event.startTime).format('MMMM Do YYYY, h:mm:ss a');
+      let end = moment(this.props.event.endTime).format('MMMM Do YYYY, h:mm:ss a');
       return `${start} - ${end}`;
   }
   toggleNotes () {
@@ -22,12 +23,12 @@ class Event extends React.Component {
   }
   render() {
     return (
-    <div>
+    <div className="event">
       <div className="title">{this.props.event.summary}</div>
       <div className="time">
         {this.setTime()}
       </div>
-    { this.state.isOpen ? (<NoteList showNotes={this.state.isOpen} onClose={this.toggleNotes} eventId={this.props.event.id}/>) : (<div><button onClick={this.toggleNotes}>Show notes</button></div>) }
+    { this.state.isOpen ? (<NoteList showNotes={this.state.isOpen} onClose={this.toggleNotes} eventName={this.props.event.summary} eventId={this.props.event.id}/>) : (<div><button onClick={this.toggleNotes}>Show notes</button></div>) }
     </div>
     )
   }

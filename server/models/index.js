@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 mongoose.connect(process.env.DB_URI)
 
-let eventSchema = mongoose.Schema({
+let eventSchema = new mongoose.Schema({
   id: {
     type: String,
     unique: true
@@ -15,18 +15,16 @@ let eventSchema = mongoose.Schema({
   endDate : Date
 })
 
-let noteSchema = mongoose.Schema({
-  id: {
-    type: Number,
+let noteSchema = new mongoose.Schema({
+  text : {
+    type: String,
     unique: true
   },
-  name : String,
-  text : String,
   created : {
     type : Date,
     default: Date.now
   },
-  id_Event : Number
+  id_Event : String
 })
 
 let Event = mongoose.model('Event', eventSchema)
@@ -52,21 +50,18 @@ let saveEvents = (events) => {
   )
 }
 
-let saveNotes = (notes, eventId) => {
-  return Promise.all (
-    notes.map((note) => {
-      return Note.findOneAndUpdate(
-        { id : note.id },
-        {
-          id : note.id,
-          name : name,
-          text : text,
-          id_Event : eventId
-        },
-        { upsert : true }
-      ).exec()
+let saveNote = (noteText, eventId, callback) => {
+    Note.findOneAndUpdate(
+      { text : noteText },
+      {
+        text : noteText,
+        id_Event : eventId
+      },
+      { upsert : true }
+    ).exec((err, note) => {
+      if(err) callback(err)
+      callback(null, note)
     })
-  )
 }
 
 let retrieveAllDayEvents = () => {
@@ -102,18 +97,14 @@ let retrieveDailyEvents = () => {
 let retrieveNotes = (eventID) => {
   return Note.find(
     {
-      id_Event : eventID, 
-      created : {
-        $exists : true,
-        $ne: null
-      }
+      id_Event : eventID
     })
-    .sort('+created')
+    .sort('+eventID')
     .exec()
 }
 
 module.exports.retrieveNotes = retrieveNotes
 module.exports.retrieveAllDayEvents = retrieveAllDayEvents
 module.exports.retrieveDailyEvents = retrieveDailyEvents
-module.exports.saveNotes = saveNotes
+module.exports.saveNote = saveNote
 module.exports.saveEvents = saveEvents

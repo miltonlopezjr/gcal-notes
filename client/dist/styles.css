@@ -119,6 +119,25 @@ Grid
   font-weight: bold;
 }
 
-.time {
-  
+.event{
+	padding: 20px;
+}
+
+.event:nth-child(even){
+	background-color: grey;
+}
+
+.noteText {
+	padding:5px;
+}
+
+.noteText:nth-child(even){
+	background-color: grey;
+}
+
+.closeButton {
+	float:right;
+}
+.noteIcons {
+	float:right;
 }

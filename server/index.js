@@ -47,12 +47,28 @@ app.get('/notes', (req, res) => {
       res.send(notes)
     })
     .catch((err) => {
-      res.end(err);
+      res.send(err);
     })
   }
-  else{
+  else {
     res.send('no eventID')
   }
+})
+
+app.post('/note', (req,res) => {
+  if(req.body.eventId && req.body.noteText)
+  {
+    db.saveNote(req.body.noteText,req.body.eventId, (err, data) => {
+      if(err){
+        res.sendStatus(500)
+      } else {
+        res.sendStatus(201);
+      }
+    })
+  } else {
+    res.send('no eventid and note')
+  }
+    
 })
 
 app.get('/getAccessURL', (req, res) => {

@@ -11,21 +11,21 @@ class NoteList extends React.Component {
     }
     this.getNotes = this.getNotes.bind(this);
     this.handleInputNoteChange = this.handleInputNoteChange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.postNote = this.postNote.bind(this)
   }
   componentDidMount(){
     this.getNotes(this.props.eventId)
-    console.log('mounted');
   }
   getNotes (eventId){
-    console.log(eventId)
     axios.get(`/notes?eventId=${eventId}`)
     .then(({data}) => {
-      this.setState = {
+      this.setState({
         notes : data
-      }
+      })
     })
     .catch((err) => {
-
+      console.log(err``)
     })
   }
   handleInputNoteChange (event){
@@ -36,10 +36,15 @@ class NoteList extends React.Component {
 
   postNote (note) {
     axios.post('/note', {
-      note : note
+      noteText : note,
+      eventId : this.props.eventId
     })
     .then((res)=> {
       console.log('note saved!')
+      this.setState({
+        inputNote: ''
+      })
+      this.getNotes(this.props.eventId)
     })
     .catch((err) => {
       console.log(err)
@@ -48,7 +53,7 @@ class NoteList extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    postNote(this.inputNote)
+    this.postNote(this.state.inputNote)
   }
 
   render (){
@@ -80,23 +85,23 @@ class NoteList extends React.Component {
     return (
     <div className="backdrop" style={backdropStyle}>
       <div className="modal" style={modalStyle}>
-        <h1>You have {this.state.notes.length} calendar event notes!</h1>
+        <div className="closeButton">
+          <button onClick={this.props.onClose}>Close</button>
+        </div>
+        <h1>You have {this.state.notes.length} <u>{this.props.eventName}</u> notes!</h1>
         <div>
           {
-            this.state.notes.map((note) => ( <Note key={note.id} note={note} /> ))
+            this.state.notes.map((note) => ( <Note key={note.id} note={note} eventid={this.props.eventId} /> ))
           }
         </div>
         <div>
-          <form>
+          <form onSubmit={this.handleSubmit}>
             <label>
               Add Note:
               <textarea value={this.state.inputNote} rows="10" cols="33" onChange={this.handleInputNoteChange} />
             </label>
             <input type="submit" value="Submit"></input>
           </form>
-        </div>
-        <div>
-          <button onClick={this.props.onClose}>Close</button>
         </div>
       </div>
     </div>
